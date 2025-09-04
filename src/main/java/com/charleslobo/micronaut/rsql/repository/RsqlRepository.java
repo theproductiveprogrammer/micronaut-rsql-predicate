@@ -8,4 +8,6 @@ public interface RsqlRepository<T> {
 	List<T> findByRsql(String rsql);
 
 	Page<T> findByRsql(String rsql, Pageable pageable);
+
+	long countByRsql(String rsql);
 }

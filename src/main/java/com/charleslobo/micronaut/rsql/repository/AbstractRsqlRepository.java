@@ -49,4 +49,22 @@ public class AbstractRsqlRepository<T> implements RsqlRepository<T> {
 
 		return Page.of(results, pageable, total);
 	}
+
+	@Override
+	public long countByRsql(String rsql) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+		Root<T> root = countQuery.from(entityClass);
+
+		countQuery.select(cb.count(root));
+
+		if (rsql != null && !rsql.isBlank()) {
+			Predicate predicate =
+					builder.buildPredicate(
+							new cz.jirutka.rsql.parser.RSQLParser().parse(rsql), root, cb, entityClass);
+			countQuery.where(predicate);
+		}
+
+		return em.createQuery(countQuery).getSingleResult();
+	}
 }
