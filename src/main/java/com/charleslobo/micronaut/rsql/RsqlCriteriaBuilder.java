@@ -76,16 +76,22 @@ public class RsqlCriteriaBuilder {
 
 		switch (comparison.getOperator().getSymbol()) {
 			case "==":
+			case "=eq=":
 				return cb.equal(root.get(fieldName), value);
 			case "!=":
+			case "=ne=":
 				return cb.notEqual(root.get(fieldName), value);
 			case ">":
+			case "=gt=":
 				return cb.greaterThan(root.get(fieldName), (Comparable) value);
 			case "<":
+			case "=lt=":
 				return cb.lessThan(root.get(fieldName), (Comparable) value);
 			case ">=":
+			case "=ge=":
 				return cb.greaterThanOrEqualTo(root.get(fieldName), (Comparable) value);
 			case "<=":
+			case "=le=":
 				return cb.lessThanOrEqualTo(root.get(fieldName), (Comparable) value);
 			case "=like=":
 				return cb.like(root.get(fieldName), value.toString());
@@ -99,12 +105,17 @@ public class RsqlCriteriaBuilder {
 	 * Returns the Java type of a given field in the entity.
 	 */
 	private Class<?> getFieldType(Class<?> entityClass, String fieldName) {
-		try {
-			Field field = entityClass.getDeclaredField(fieldName);
-			return field.getType();
-		} catch (NoSuchFieldException e) {
-			throw new IllegalArgumentException("Unknown field: " + fieldName, e);
+		Class<?> currentClass = entityClass;
+		while (currentClass != null) {
+			try {
+				Field field = currentClass.getDeclaredField(fieldName);
+				return field.getType();
+			} catch (NoSuchFieldException e) {
+				// Field not found in current class, try parent class
+				currentClass = currentClass.getSuperclass();
+			}
 		}
+		throw new IllegalArgumentException("Unknown field: " + fieldName);
 	}
 
 	/**
