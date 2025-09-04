@@ -42,7 +42,7 @@ public class RsqlCriteriaBuilder {
 	/**
 	 * Recursively builds a Predicate from the RSQL AST.
 	 */
-	private <T> Predicate buildPredicate(
+	public <T> Predicate buildPredicate(
 			Node node, Root<T> root, CriteriaBuilder cb, Class<T> entityClass) {
 		if (node instanceof AndNode) {
 			List<Predicate> children =
