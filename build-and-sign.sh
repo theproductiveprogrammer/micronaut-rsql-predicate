@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 GPG_KEY_ID="9F19F738897EB199"
 ARTIFACT_NAME="micronaut-rsql-predicate"
-VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
 TARGET_DIR="target"
 
 echo -e "${BLUE}🚀 Micronaut RSQL Predicate - Build and Sign Script${NC}"
@@ -44,13 +44,6 @@ print_info() {
 # Check prerequisites
 echo -e "${BLUE}🔍 Checking prerequisites...${NC}"
 
-# Check if Maven is available
-if ! command -v mvn &> /dev/null; then
-    print_error "Maven is not installed or not in PATH"
-    exit 1
-fi
-print_status "Maven is available"
-
 # Check if GPG is available
 if ! command -v gpg &> /dev/null; then
     print_error "GPG is not installed or not in PATH"
@@ -71,16 +64,16 @@ echo ""
 
 # Clean and build
 echo -e "${BLUE}🧹 Cleaning previous build...${NC}"
-mvn clean
+./mvnw clean
 print_status "Clean completed"
 
 echo -e "${BLUE}🔨 Building artifacts...${NC}"
-mvn package
+./mvnw package
 print_status "Build completed"
 
 # Generate effective POM
 echo -e "${BLUE}📄 Generating effective POM...${NC}"
-mvn help:effective-pom -Doutput="$TARGET_DIR/pom.xml" -q
+./mvnw help:effective-pom -Doutput="$TARGET_DIR/pom.xml" -q
 print_status "Effective POM generated"
 
 # List generated artifacts

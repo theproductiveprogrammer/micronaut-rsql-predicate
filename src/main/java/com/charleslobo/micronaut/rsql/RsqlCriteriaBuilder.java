@@ -77,10 +77,26 @@ public class RsqlCriteriaBuilder {
 		switch (comparison.getOperator().getSymbol()) {
 			case "==":
 			case "=eq=":
-				return cb.equal(root.get(fieldName), value);
+				// Check if the value contains wildcard patterns and convert to LIKE
+				String stringValue = value.toString();
+				if (stringValue.contains("*")) {
+					// Convert wildcard pattern to SQL LIKE pattern
+					String likePattern = stringValue.replace("*", "%");
+					return cb.like(root.get(fieldName), likePattern);
+				} else {
+					return cb.equal(root.get(fieldName), value);
+				}
 			case "!=":
 			case "=ne=":
-				return cb.notEqual(root.get(fieldName), value);
+				// Check if the value contains wildcard patterns and convert to NOT LIKE
+				String stringValueNe = value.toString();
+				if (stringValueNe.contains("*")) {
+					// Convert wildcard pattern to SQL NOT LIKE pattern
+					String likePattern = stringValueNe.replace("*", "%");
+					return cb.not(cb.like(root.get(fieldName), likePattern));
+				} else {
+					return cb.notEqual(root.get(fieldName), value);
+				}
 			case ">":
 			case "=gt=":
 				return cb.greaterThan(root.get(fieldName), (Comparable) value);
