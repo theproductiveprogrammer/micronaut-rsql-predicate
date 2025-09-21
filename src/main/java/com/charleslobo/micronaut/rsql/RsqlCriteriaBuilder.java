@@ -110,7 +110,10 @@ public class RsqlCriteriaBuilder {
 			case "=le=":
 				return cb.lessThanOrEqualTo(root.get(fieldName), (Comparable) value);
             case "=in=":
-                return root.get(fieldName).in(value);
+                List<Object> values = comparison.getArguments().stream()
+                    .map(arg -> convertValue(arg, getFieldType(entityClass, fieldName)))
+                    .collect(Collectors.toList());
+                return root.get(fieldName).in(values);
 			case "=like=":
 				return cb.like(root.get(fieldName), value.toString());
 			default:
