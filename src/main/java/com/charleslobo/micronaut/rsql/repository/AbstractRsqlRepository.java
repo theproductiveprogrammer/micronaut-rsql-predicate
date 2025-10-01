@@ -32,7 +32,21 @@ public class AbstractRsqlRepository<T> implements RsqlRepository<T> {
 
 	@Override
 	public Page<T> findByRsql(String rsql, Pageable pageable) {
-		TypedQuery<T> query = em.createQuery(builder.fromRsql(rsql, entityClass));
+		CriteriaQuery<T> criteriaQuery = builder.fromRsql(rsql, entityClass);
+
+		// Apply sorting from Pageable
+		if (pageable.isSorted()) {
+			CriteriaBuilder cb = em.getCriteriaBuilder();
+			Root<T> root = (Root<T>) criteriaQuery.getRoots().iterator().next();
+			List<jakarta.persistence.criteria.Order> orders = pageable.getSort().getOrderBy().stream()
+				.map(order -> order.isAscending()
+					? cb.asc(root.get(order.getProperty()))
+					: cb.desc(root.get(order.getProperty())))
+				.collect(java.util.stream.Collectors.toList());
+			criteriaQuery.orderBy(orders);
+		}
+
+		TypedQuery<T> query = em.createQuery(criteriaQuery);
 
 		query.setFirstResult((int) pageable.getOffset());
 		query.setMaxResults(pageable.getSize());
