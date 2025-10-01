@@ -1,0 +1,10 @@
+[tools]
+java = "21"
+maven = "latest"
+
+[tasks]
+clean="mvn clean"
+compile="mvn compile"
+build="mvn clean compile"
+start="mvn clean source:jar install -DskipTests"
+
