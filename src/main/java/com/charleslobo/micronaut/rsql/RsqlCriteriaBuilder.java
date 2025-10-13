@@ -114,6 +114,11 @@ public class RsqlCriteriaBuilder {
                     .map(arg -> convertValue(arg, getFieldType(entityClass, fieldName)))
                     .collect(Collectors.toList());
                 return root.get(fieldName).in(values);
+            case "=out=":
+                List<Object> outValues = comparison.getArguments().stream()
+                    .map(arg -> convertValue(arg, getFieldType(entityClass, fieldName)))
+                    .collect(Collectors.toList());
+                return cb.not(root.get(fieldName).in(outValues));
 			case "=like=":
 				return cb.like(root.get(fieldName), value.toString());
 			default:
