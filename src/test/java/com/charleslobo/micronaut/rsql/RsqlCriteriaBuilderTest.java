@@ -140,7 +140,9 @@ public class RsqlCriteriaBuilderTest {
         // Test that modified=gt=1761887581946 works with Date fields
         String rsql = "modified=gt=1761887581946";
 
-        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        CriteriaQuery<DateTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(query);
+        when(query.from(DateTestEntity.class)).thenReturn((Root) root);
         when(criteriaBuilder.<java.util.Date>greaterThan(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
 
         try {
@@ -157,7 +159,9 @@ public class RsqlCriteriaBuilderTest {
         // Test that modified=lt=1761887581946 works with Date fields
         String rsql = "modified=lt=1761887581946";
 
-        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        CriteriaQuery<DateTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(query);
+        when(query.from(DateTestEntity.class)).thenReturn((Root) root);
         when(criteriaBuilder.<java.util.Date>lessThan(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
 
         try {
@@ -173,7 +177,9 @@ public class RsqlCriteriaBuilderTest {
         // Test that modified=ge=1761887581946 works with Date fields
         String rsql = "modified=ge=1761887581946";
 
-        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        CriteriaQuery<DateTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(query);
+        when(query.from(DateTestEntity.class)).thenReturn((Root) root);
         when(criteriaBuilder.<java.util.Date>greaterThanOrEqualTo(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
 
         try {
@@ -189,7 +195,9 @@ public class RsqlCriteriaBuilderTest {
         // Test that java.sql.Timestamp fields work too
         String rsql = "created=gt=1761887581946";
 
-        when(criteriaBuilder.createQuery(TimestampTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        CriteriaQuery<TimestampTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TimestampTestEntity.class)).thenReturn(query);
+        when(query.from(TimestampTestEntity.class)).thenReturn((Root) root);
         when(criteriaBuilder.<java.sql.Timestamp>greaterThan(any(), any(java.sql.Timestamp.class))).thenReturn(mock(Predicate.class));
 
         try {
