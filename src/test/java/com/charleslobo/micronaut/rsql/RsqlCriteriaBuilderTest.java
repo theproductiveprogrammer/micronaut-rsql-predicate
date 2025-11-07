@@ -135,16 +135,107 @@ public class RsqlCriteriaBuilderTest {
         }
     }
 
+    @Test
+    public void testDateGreaterThanComparison() {
+        // Test that modified=gt=1761887581946 works with Date fields
+        String rsql = "modified=gt=1761887581946";
+
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        when(criteriaBuilder.<java.util.Date>greaterThan(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, DateTestEntity.class);
+            // If we get here, the query was parsed successfully
+            // The Date field should have been converted from Unix timestamp
+        } catch (Exception e) {
+            fail("Should handle Date fields with Unix timestamps: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDateLessThanComparison() {
+        // Test that modified=lt=1761887581946 works with Date fields
+        String rsql = "modified=lt=1761887581946";
+
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        when(criteriaBuilder.<java.util.Date>lessThan(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, DateTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle Date fields with Unix timestamps: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDateGreaterThanOrEqualComparison() {
+        // Test that modified=ge=1761887581946 works with Date fields
+        String rsql = "modified=ge=1761887581946";
+
+        when(criteriaBuilder.createQuery(DateTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        when(criteriaBuilder.<java.util.Date>greaterThanOrEqualTo(any(), any(java.util.Date.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, DateTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle Date fields with Unix timestamps: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testTimestampComparison() {
+        // Test that java.sql.Timestamp fields work too
+        String rsql = "created=gt=1761887581946";
+
+        when(criteriaBuilder.createQuery(TimestampTestEntity.class)).thenReturn(mock(CriteriaQuery.class));
+        when(criteriaBuilder.<java.sql.Timestamp>greaterThan(any(), any(java.sql.Timestamp.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TimestampTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle Timestamp fields with Unix timestamps: " + e.getMessage());
+        }
+    }
+
     // Simple test entity for testing
     public static class TestEntity {
         private String linkedin;
-        
+
         public String getLinkedin() {
             return linkedin;
         }
-        
+
         public void setLinkedin(String linkedin) {
             this.linkedin = linkedin;
+        }
+    }
+
+    // Test entity with Date fields
+    public static class DateTestEntity {
+        private java.util.Date modified;
+
+        public java.util.Date getModified() {
+            return modified;
+        }
+
+        public void setModified(java.util.Date modified) {
+            this.modified = modified;
+        }
+    }
+
+    // Test entity with Timestamp fields
+    public static class TimestampTestEntity {
+        private java.sql.Timestamp created;
+
+        public java.sql.Timestamp getCreated() {
+            return created;
+        }
+
+        public void setCreated(java.sql.Timestamp created) {
+            this.created = created;
         }
     }
 }

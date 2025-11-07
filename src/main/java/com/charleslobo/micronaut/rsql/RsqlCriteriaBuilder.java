@@ -159,6 +159,9 @@ public class RsqlCriteriaBuilder {
 		else if (type == Byte.class || type == byte.class) return Byte.valueOf(value);
 		else if (type == LocalDate.class) return LocalDate.parse(value);
 		else if (type == Instant.class) return Instant.parse(value);
+		else if (type == java.util.Date.class) return new java.util.Date(Long.parseLong(value));
+		else if (type == java.sql.Date.class) return new java.sql.Date(Long.parseLong(value));
+		else if (type == java.sql.Timestamp.class) return new java.sql.Timestamp(Long.parseLong(value));
 		else if (type.isEnum()) return Enum.valueOf((Class<Enum>) type, value);
 		else throw new IllegalArgumentException("Unsupported type: " + type);
 	}
