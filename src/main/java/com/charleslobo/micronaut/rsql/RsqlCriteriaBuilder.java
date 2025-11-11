@@ -9,16 +9,38 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
 public class RsqlCriteriaBuilder {
 
 	private final EntityManager entityManager;
+	private final RSQLParser rsqlParser;
 
 	public RsqlCriteriaBuilder(EntityManager entityManager) {
 		this.entityManager = entityManager;
+		// Create custom operators
+		Set<ComparisonOperator> operators = new HashSet<>(RSQLOperators.defaultOperators());
+		// Null check operators
+		operators.add(new ComparisonOperator("=isnull=", true));
+		operators.add(new ComparisonOperator("=null=", true));
+		operators.add(new ComparisonOperator("=na=", true));
+		operators.add(new ComparisonOperator("=nn=", true));
+		operators.add(new ComparisonOperator("=notnull=", true));
+		operators.add(new ComparisonOperator("=isnotnull=", true));
+		// Between operators
+		operators.add(new ComparisonOperator("=bt=", true));
+		operators.add(new ComparisonOperator("=nb=", true));
+		// Case-insensitive string operators
+		operators.add(new ComparisonOperator("=ilike=", true));
+		operators.add(new ComparisonOperator("=icase=", true));
+		operators.add(new ComparisonOperator("=notlike=", true));
+		operators.add(new ComparisonOperator("=inotlike=", true));
+
+		this.rsqlParser = new RSQLParser(operators);
 	}
 
 	/**
@@ -31,7 +53,7 @@ public class RsqlCriteriaBuilder {
 		query.select(root);
 
 		if (rsql != null && !rsql.isBlank()) {
-			Node rootNode = new RSQLParser().parse(rsql);
+			Node rootNode = rsqlParser.parse(rsql);
 			Predicate predicate = buildPredicate(rootNode, root, cb, entityClass);
 			query.where(predicate);
 		}
@@ -71,10 +93,40 @@ public class RsqlCriteriaBuilder {
 	private <T> Predicate comparisonNodeToPredicate(
 			ComparisonNode comparison, Root<T> root, CriteriaBuilder cb, Class<T> entityClass) {
 		String fieldName = comparison.getSelector();
+		String operator = comparison.getOperator().getSymbol();
+
+		// Handle null check operators that don't need value conversion
+		if (operator.equals("=isnull=") || operator.equals("=null=") || operator.equals("=na=")) {
+			return cb.isNull(root.get(fieldName));
+		}
+		if (operator.equals("=nn=") || operator.equals("=notnull=") || operator.equals("=isnotnull=")) {
+			return cb.isNotNull(root.get(fieldName));
+		}
+
+		// Handle between operators that need two values
+		if (operator.equals("=bt=")) {
+			if (comparison.getArguments().size() < 2) {
+				throw new IllegalArgumentException("Between operator requires two arguments");
+			}
+			Class<?> fieldType = getFieldType(entityClass, fieldName);
+			Comparable lowerBound = (Comparable) convertValue(comparison.getArguments().get(0), fieldType);
+			Comparable upperBound = (Comparable) convertValue(comparison.getArguments().get(1), fieldType);
+			return cb.between(root.get(fieldName), lowerBound, upperBound);
+		}
+		if (operator.equals("=nb=")) {
+			if (comparison.getArguments().size() < 2) {
+				throw new IllegalArgumentException("Not between operator requires two arguments");
+			}
+			Class<?> fieldType = getFieldType(entityClass, fieldName);
+			Comparable lowerBound = (Comparable) convertValue(comparison.getArguments().get(0), fieldType);
+			Comparable upperBound = (Comparable) convertValue(comparison.getArguments().get(1), fieldType);
+			return cb.not(cb.between(root.get(fieldName), lowerBound, upperBound));
+		}
+
 		Object value =
 				convertValue(comparison.getArguments().get(0), getFieldType(entityClass, fieldName));
 
-		switch (comparison.getOperator().getSymbol()) {
+		switch (operator) {
 			case "==":
 			case "=eq=":
 				// Check if the value contains wildcard patterns and convert to LIKE
@@ -121,6 +173,18 @@ public class RsqlCriteriaBuilder {
                 return cb.not(root.get(fieldName).in(outValues));
 			case "=like=":
 				return cb.like(root.get(fieldName), value.toString());
+			case "=ilike=":
+				// Case-insensitive LIKE
+				return cb.like(cb.lower(root.get(fieldName)), value.toString().toLowerCase());
+			case "=icase=":
+				// Case-insensitive equal
+				return cb.equal(cb.lower(root.get(fieldName)), value.toString().toLowerCase());
+			case "=notlike=":
+				// NOT LIKE
+				return cb.notLike(root.get(fieldName), value.toString());
+			case "=inotlike=":
+				// Case-insensitive NOT LIKE
+				return cb.notLike(cb.lower(root.get(fieldName)), value.toString().toLowerCase());
 			default:
 				throw new UnsupportedOperationException(
 						"Operator not supported: " + comparison.getOperator().getSymbol());

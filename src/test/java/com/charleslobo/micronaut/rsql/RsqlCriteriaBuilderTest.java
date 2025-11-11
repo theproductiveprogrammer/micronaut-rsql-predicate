@@ -208,6 +208,226 @@ public class RsqlCriteriaBuilderTest {
         }
     }
 
+    @Test
+    public void testIsNullOperator() {
+        // Test =isnull= operator
+        String rsql = "linkedin=isnull=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =isnull= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNullOperator() {
+        // Test =null= operator (alias for =isnull=)
+        String rsql = "linkedin=null=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =null= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNaOperator() {
+        // Test =na= operator (alias for =isnull=)
+        String rsql = "linkedin=na=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =na= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testIsNotNullOperator() {
+        // Test =isnotnull= operator
+        String rsql = "linkedin=isnotnull=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNotNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =isnotnull= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNotNullOperator() {
+        // Test =notnull= operator (alias for =isnotnull=)
+        String rsql = "linkedin=notnull=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNotNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =notnull= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNnOperator() {
+        // Test =nn= operator (alias for =isnotnull=)
+        String rsql = "linkedin=nn=true";
+
+        CriteriaQuery<TestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(TestEntity.class)).thenReturn(query);
+        when(query.from(TestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.isNotNull(any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, TestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =nn= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testBetweenOperator() {
+        // Test =bt= operator for between
+        String rsql = "age=bt=(18,65)";
+
+        CriteriaQuery<AgeTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(AgeTestEntity.class)).thenReturn(query);
+        when(query.from(AgeTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.between(any(), any(Comparable.class), any(Comparable.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, AgeTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =bt= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNotBetweenOperator() {
+        // Test =nb= operator for not between
+        String rsql = "age=nb=(18,65)";
+
+        CriteriaQuery<AgeTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(AgeTestEntity.class)).thenReturn(query);
+        when(query.from(AgeTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.between(any(), any(Comparable.class), any(Comparable.class))).thenReturn(mock(Predicate.class));
+        when(criteriaBuilder.not(any(Predicate.class))).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, AgeTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =nb= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCaseInsensitiveLikeOperator() {
+        // Test =ilike= operator for case-insensitive LIKE
+        String rsql = "name=ilike=*john*";
+
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.lower(any())).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
+        when(criteriaBuilder.like(any(), anyString())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, NameTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =ilike= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCaseInsensitiveEqualOperator() {
+        // Test =icase= operator for case-insensitive equal
+        String rsql = "name=icase=JOHN";
+
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.lower(any())).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
+        when(criteriaBuilder.equal(any(), any())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, NameTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =icase= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNotLikeOperator() {
+        // Test =notlike= operator for NOT LIKE
+        String rsql = "name=notlike=*spam*";
+
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.notLike(any(), anyString())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, NameTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =notlike= operator: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCaseInsensitiveNotLikeOperator() {
+        // Test =inotlike= operator for case-insensitive NOT LIKE
+        String rsql = "name=inotlike=*SPAM*";
+
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.lower(any())).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
+        when(criteriaBuilder.notLike(any(), anyString())).thenReturn(mock(Predicate.class));
+
+        try {
+            rsqlCriteriaBuilder.fromRsql(rsql, NameTestEntity.class);
+            // If we get here, the query was parsed successfully
+        } catch (Exception e) {
+            fail("Should handle =inotlike= operator: " + e.getMessage());
+        }
+    }
+
     // Simple test entity for testing
     public static class TestEntity {
         private String linkedin;
@@ -244,6 +464,32 @@ public class RsqlCriteriaBuilderTest {
 
         public void setCreated(java.sql.Timestamp created) {
             this.created = created;
+        }
+    }
+
+    // Test entity with age field for between tests
+    public static class AgeTestEntity {
+        private Integer age;
+
+        public Integer getAge() {
+            return age;
+        }
+
+        public void setAge(Integer age) {
+            this.age = age;
+        }
+    }
+
+    // Test entity with name field for case-insensitive tests
+    public static class NameTestEntity {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }
