@@ -44,6 +44,14 @@ public class RsqlCriteriaBuilder {
 	}
 
 	/**
+	 * Parses an RSQL string into an AST Node using the configured parser with custom operators.
+	 * This should be used instead of creating new RSQLParser() instances to ensure custom operators are recognized.
+	 */
+	public Node parse(String rsql) {
+		return rsqlParser.parse(rsql);
+	}
+
+	/**
 	 * Converts an RSQL string into a CriteriaQuery for the given entity class.
 	 */
 	public <T> CriteriaQuery<T> fromRsql(String rsql, Class<T> entityClass) {

@@ -1,7 +1,6 @@
 package com.charleslobo.micronaut.rsql.repository;
 
 import com.charleslobo.micronaut.rsql.RsqlCriteriaBuilder;
-import cz.jirutka.rsql.parser.RSQLParser;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import jakarta.persistence.EntityManager;
@@ -57,7 +56,7 @@ public class AbstractRsqlRepository<T> implements RsqlRepository<T> {
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		Root<T> root = countQuery.from(entityClass);
 		Predicate predicate =
-				builder.buildPredicate(new RSQLParser().parse(rsql), root, cb, entityClass);
+				builder.buildPredicate(builder.parse(rsql), root, cb, entityClass);
 		countQuery.select(cb.count(root)).where(predicate);
 		Long total = em.createQuery(countQuery).getSingleResult();
 
@@ -74,8 +73,7 @@ public class AbstractRsqlRepository<T> implements RsqlRepository<T> {
 
 		if (rsql != null && !rsql.isBlank()) {
 			Predicate predicate =
-					builder.buildPredicate(
-							new cz.jirutka.rsql.parser.RSQLParser().parse(rsql), root, cb, entityClass);
+					builder.buildPredicate(builder.parse(rsql), root, cb, entityClass);
 			countQuery.where(predicate);
 		}
 
