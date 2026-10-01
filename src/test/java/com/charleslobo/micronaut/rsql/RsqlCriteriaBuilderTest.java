@@ -354,6 +354,33 @@ public class RsqlCriteriaBuilderTest {
     }
 
     @Test
+    public void testLikeOperatorIsRegistered() {
+        Predicate expected = mock(Predicate.class);
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.like(any(), eq("john"))).thenReturn(expected);
+
+        rsqlCriteriaBuilder.fromRsql("name=like=john", NameTestEntity.class);
+
+        verify(query).where(expected);
+    }
+
+    @Test
+    public void testIcOperatorIsCaseInsensitiveEqual() {
+        Predicate expected = mock(Predicate.class);
+        CriteriaQuery<NameTestEntity> query = mock(CriteriaQuery.class);
+        when(criteriaBuilder.createQuery(NameTestEntity.class)).thenReturn(query);
+        when(query.from(NameTestEntity.class)).thenReturn((Root) root);
+        when(criteriaBuilder.lower(any())).thenReturn(mock(jakarta.persistence.criteria.Expression.class));
+        when(criteriaBuilder.equal(any(jakarta.persistence.criteria.Expression.class), eq("john"))).thenReturn(expected);
+
+        rsqlCriteriaBuilder.fromRsql("name=ic=John", NameTestEntity.class);
+
+        verify(query).where(expected);
+    }
+
+    @Test
     public void testCaseInsensitiveLikeOperator() {
         // Test =ilike= operator for case-insensitive LIKE
         String rsql = "name=ilike=*john*";

@@ -35,7 +35,9 @@ public class RsqlCriteriaBuilder {
 		operators.add(new ComparisonOperator("=bt=", true));
 		operators.add(new ComparisonOperator("=nb=", true));
 		// Case-insensitive string operators
+		operators.add(new ComparisonOperator("=like=", true));
 		operators.add(new ComparisonOperator("=ilike=", true));
+		operators.add(new ComparisonOperator("=ic=", true));
 		operators.add(new ComparisonOperator("=icase=", true));
 		operators.add(new ComparisonOperator("=notlike=", true));
 		operators.add(new ComparisonOperator("=inotlike=", true));
@@ -185,6 +187,7 @@ public class RsqlCriteriaBuilder {
 				// Case-insensitive LIKE
 				return cb.like(cb.lower(root.get(fieldName)), value.toString().toLowerCase());
 			case "=icase=":
+			case "=ic=":
 				// Case-insensitive equal
 				return cb.equal(cb.lower(root.get(fieldName)), value.toString().toLowerCase());
 			case "=notlike=":

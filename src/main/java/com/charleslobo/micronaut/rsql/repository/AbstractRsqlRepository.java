@@ -55,9 +55,12 @@ public class AbstractRsqlRepository<T> implements RsqlRepository<T> {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
 		Root<T> root = countQuery.from(entityClass);
-		Predicate predicate =
-				builder.buildPredicate(builder.parse(rsql), root, cb, entityClass);
-		countQuery.select(cb.count(root)).where(predicate);
+		countQuery.select(cb.count(root));
+		if (rsql != null && !rsql.isBlank()) {
+			Predicate predicate =
+					builder.buildPredicate(builder.parse(rsql), root, cb, entityClass);
+			countQuery.where(predicate);
+		}
 		Long total = em.createQuery(countQuery).getSingleResult();
 
 		return Page.of(results, pageable, total);
